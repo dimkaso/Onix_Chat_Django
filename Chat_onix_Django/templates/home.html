@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Чат створений за допомогую Django</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .chat-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+    }
+
+    h2 {
+        color: #333;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    input[type="submit"] {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        border: none;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    input[type="submit"]:hover {
+        background: linear-gradient(135deg, #5a79e5, #945dc4);
+    }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+    <h2>Django Chat</h2>
+    <form id="post-form" method="POST" action="checkview">
+        {% csrf_token %}
+        <label for="room_name">Назва кімнати</label>
+        <input type="text" name="room_name" id="room_name" placeholder="" required>
+        <label for="username">І'я користувача</label>
+        <input type="text" name="username" id="username" placeholder="" required>
+        <input type="submit" value="Доєднатися до чату">
+    </form>
+</div>
+
+</body>
+</html>

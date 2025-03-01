@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DjChat - {{ room }}</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0 auto;
+        max-width: 800px;
+        padding: 0 20px;
+        background-color: #f4f4f4;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    .chat-box {
+        background: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow-y: auto;
+        max-height: 400px;
+    }
+
+    .message {
+        padding: 10px;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+
+    .username {
+        font-weight: bold;
+    }
+
+    .time {
+        font-size: 12px;
+        color: #777;
+        float: right;
+    }
+
+    .input-box {
+        display: flex;
+        gap: 10px;
+    }
+
+    input[type="text"] {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #45a049;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<h2>{{ room }} - чат на Django</h2>
+
+<div class="chat-box" id="display"></div>
+
+<div class="input-box">
+    <form id="post-form">
+        {% csrf_token %}
+        <input type="hidden" name="username" id="username" value="{{ username }}"/>
+        <input type="hidden" name="room_id" id="room_id" value="{{ room_details.id }}"/>
+        <input type="text" name="message" id="message" placeholder="Введіть повідомлення..."/>
+        <input type="submit" value="Відправити">
+    </form>
+</div>
+
+<script>
+    const colors = ["#ff5733", "#33ff57", "#3357ff", "#f4a261", "#2a9d8f", "#e9c46a", "#8a4d76", "#ff006e"];
+    const userColors = {};
+
+    function getUserColor(username) {
+        if (!userColors[username]) {
+            userColors[username] = colors[Math.floor(Math.random() * colors.length)];
+        }
+        return userColors[username];
+    }
+
+    $(document).ready(function() {
+        setInterval(function() {
+            $.ajax({
+                type: 'GET',
+                url : "/getMessages/{{room}}/",
+                success: function(response) {
+                    $("#display").empty();
+                    response.messages.forEach(msg => {
+                        let color = getUserColor(msg.user);
+                        let messageHtml = `<div class='message' style='background: #eee;'>
+                            <span class='username' style='color: ${color};'>${msg.user}</span>
+                            <span class='time'>${msg.date}</span>
+                            <p>${msg.value}</p>
+                        </div>`;
+                        $("#display").append(messageHtml);
+                    });
+                },
+                error: function() {
+                    alert('Помилка');
+                }
+            });
+        }, 1000);
+    });
+
+    $(document).on('submit', '#post-form', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: '/send',
+            data: {
+                username: $('#username').val(),
+                room_id: $('#room_id').val(),
+                message: $('#message').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function() {
+                $('#message').val('');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
